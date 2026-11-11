@@ -1,0 +1,7 @@
+{
+  "name": "piparruseles",
+  "private": true,
+  "description": "Generador de placas Tiendas Montevideo (Wasabi)",
+  "scripts": { "build": "python3 build.py" },
+  "dependencies": { "jszip": "^3.10.1", "xlsx": "^0.18.5" }
+}

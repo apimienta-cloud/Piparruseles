@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generador de placas · Tiendas Montevideo · Wasabi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--verde:#92C100;--verde-osc:#004612;--wverde:#004612;--lima:#92C100;--tinta:#10201A;--gris:#5C665D;--linea:#E1E4DA;--fondo:#F7F5EE;--panel:#fff;--alerta:#FE7A02;--error:#c0392b;--lima-suave:#eef5d6}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 Inter,"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--tinta);background:var(--fondo);height:100vh;display:flex;flex-direction:column}
+button{font:inherit;cursor:pointer;border:1.5px solid var(--linea);background:#fff;border-radius:999px;padding:7px 14px;color:var(--tinta);font-weight:500;transition:.15s}
+button:hover{border-color:var(--wverde)}
+button.prim{background:var(--lima);color:var(--wverde);border-color:var(--lima);font-weight:700}
+button.prim:hover{background:#a6d61a;border-color:#a6d61a}
+button.prim:disabled{background:#5d7a57;border-color:#5d7a57;color:#c7d3c3;cursor:not-allowed}
+button.chico{padding:4px 9px;font-size:12.5px}
+button.on{background:var(--wverde);border-color:var(--wverde);color:var(--lima)}
+input[type=text],input[type=number]{font:inherit;border:1.5px solid var(--linea);border-radius:8px;padding:6px 8px;width:100%;background:#fff}
+input:focus{outline:2px solid #d6eaa0;border-color:var(--wverde)}
+header{display:flex;align-items:center;gap:14px;padding:10px 18px;background:var(--wverde);color:#F7F5EE;border-bottom:4px solid var(--lima)}
+header .marca{font-weight:800;letter-spacing:-.02em;color:var(--lima);font-size:17px;white-space:nowrap}
+header .sep{width:1px;height:22px;background:rgba(247,245,238,.35)}
+header h1{font-size:15px;margin:0;font-weight:600;white-space:nowrap;color:#F7F5EE}
+header h1 span{color:#b9c7b5;font-weight:400}
+header button{background:transparent;color:#F7F5EE;border-color:rgba(247,245,238,.4)}
+header button:hover{border-color:var(--lima);color:var(--lima)}
+header button.prim{background:var(--lima);color:var(--wverde);border-color:var(--lima);white-space:nowrap}
+header button.prim:hover{background:#a6d61a;color:var(--wverde)}
+header .ayuda,header small{color:#c9d5c5!important}
+header input[type=checkbox]{accent-color:var(--lima)}
+.pasos{display:flex;gap:8px;margin-left:12px;flex-wrap:wrap}
+.paso{display:flex;align-items:center;gap:8px}
+.paso .n{width:20px;height:20px;border-radius:50%;background:rgba(247,245,238,.18);display:grid;place-items:center;font-size:11.5px;font-weight:700;color:#F7F5EE}
+.paso.ok .n{background:var(--lima);color:var(--wverde)}
+.paso small{color:var(--gris)}
+.esp{flex:1}
+main{flex:1;display:flex;min-height:0}
+aside{width:300px;border-right:1px solid var(--linea);background:#fff;overflow:auto;flex-shrink:0}
+.item{display:flex;gap:10px;padding:9px 12px;border-bottom:1px solid #f0f0ec;cursor:pointer;align-items:center}
+.item:hover{background:#fafaf7}
+.item.sel{background:var(--lima-suave);box-shadow:inset 4px 0 0 var(--wverde)}
+.item .th{width:44px;height:55px;border-radius:5px;background:#e9e9e4 center/cover no-repeat;flex-shrink:0;position:relative}
+.item .th.vacio::after{content:"sin foto";position:absolute;inset:0;display:grid;place-items:center;font-size:9.5px;color:#999}
+.item .tx{min-width:0}
+.item .t1{font-size:12px;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .t2{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.b{font-size:10.5px;padding:1px 6px;border-radius:10px;background:#f1f1ed;color:var(--gris)}
+.b.a{background:#fff0e1;color:#b85600}
+.b.e{background:#fde8e6;color:var(--error)}
+section#editor{flex:1;overflow:auto;padding:18px 22px}
+.vacio-grande{height:100%;display:grid;place-items:center;text-align:center;color:var(--gris)}
+.vacio-grande .caja{border:2px dashed #c9d3bf;border-top:5px solid var(--lima);border-radius:16px;padding:40px 50px;background:#fff;max-width:560px}
+.vacio-grande h2{color:var(--tinta);margin:0 0 6px;font-size:19px}
+.fila{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap}
+.col-datos{width:330px;flex-shrink:0}
+.tarjeta{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:14px;margin-bottom:14px}
+.tarjeta h3{margin:0 0 10px;font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--wverde);font-weight:700}
+label.c{display:block;font-size:12px;color:var(--gris);margin:8px 0 3px}
+.fotoslot{display:flex;gap:12px;align-items:center}
+.fotoslot .th{width:70px;height:70px;border-radius:8px;background:#e9e9e4 center/cover no-repeat;flex-shrink:0}
+.fotoslot .nom{font-size:12.5px;word-break:break-all;color:var(--gris);margin-bottom:6px}
+table.var{width:100%;border-collapse:collapse}
+table.var th{font-size:11px;color:var(--gris);font-weight:500;text-align:left;padding:2px 3px}
+table.var td{padding:2px 3px}
+table.var input{padding:4px 6px}
+.escenarios{display:flex;gap:22px;flex-wrap:wrap}
+.escena{display:flex;flex-direction:column;gap:8px}
+.escena .tit{font-size:12.5px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.escena .tit small{font-weight:400;color:var(--gris)}
+.lienzo{position:relative;overflow:hidden;border-radius:6px;background:#ddd;box-shadow:0 1px 3px rgba(0,0,0,.12);cursor:grab;touch-action:none;user-select:none}
+.lienzo.arr{cursor:grabbing}
+.lienzo canvas{position:absolute;inset:0;width:100%;height:100%}
+.lienzo .sobre{position:absolute;inset:0;pointer-events:none}
+.lienzo .sobre svg{width:100%;height:100%;display:block}
+.ctrl{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ctrl input[type=range]{flex:1;min-width:90px;accent-color:var(--verde-osc)}
+.ayuda{font-size:12px;color:var(--gris)}
+.modal{position:fixed;inset:0;background:rgba(20,22,18,.55);display:none;align-items:center;justify-content:center;z-index:10}
+.modal.ver{display:flex}
+.modal .cont{background:#fff;border-radius:14px;width:min(960px,92vw);max-height:86vh;display:flex;flex-direction:column}
+.modal .cab{padding:14px 18px;border-bottom:1px solid var(--linea);display:flex;align-items:center;gap:10px}
+.modal .cab h3{margin:0;font-size:15px;flex:1}
+.grilla{padding:14px;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.grilla .op{border:2px solid transparent;border-radius:9px;padding:5px;cursor:pointer;background:#fafaf7}
+.grilla .op:hover{border-color:#cfd1ca}
+.grilla .op.sel{border-color:var(--wverde);background:var(--lima-suave)}
+.grilla .op .im{aspect-ratio:1;background:#e9e9e4 center/cover no-repeat;border-radius:6px}
+.grilla .op .nm{font-size:11px;color:var(--gris);margin-top:4px;word-break:break-all;line-height:1.25}
+.grilla .op .usada{font-size:10.5px;color:var(--alerta)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--wverde);color:var(--lima);font-weight:600;padding:10px 16px;border-radius:9px;font-size:13px;display:none;z-index:20;max-width:80vw}
+.prog{height:4px;background:var(--linea);border-radius:3px;overflow:hidden;width:160px;display:none}
+.prog{background:rgba(247,245,238,.2)!important}
+.prog i{display:block;height:100%;width:0;background:var(--lima)}
+.menu{position:relative}
+.menu .lista button{color:var(--tinta)!important}
+.menu .lista{display:none;position:absolute;right:0;top:110%;background:#fff;border:1px solid var(--linea);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:230px;z-index:5;padding:6px}
+.menu.abierto .lista{display:block}
+.menu .lista button{display:block;width:100%;text-align:left;border:0;padding:8px 10px}
+.menu .lista button:hover{background:#f4f4f0}
+.drop-hint{position:fixed;inset:0;background:rgba(146,193,0,.18);border:4px dashed var(--wverde);display:none;z-index:30;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:var(--verde-osc)}
+.drop-hint.ver{display:flex}
+</style>
+</head>
+<body>
+<header>
+  <span class="marca">Wasabi</span><span class="sep"></span><h1>Generador de placas <span>· Tiendas Montevideo</span></h1>
+  <div class="pasos">
+    <div class="paso" id="pasoExcel"><span class="n">1</span><button id="btnExcel">Cargar Excel</button><small id="lblExcel"></small></div>
+    <div class="paso" id="pasoFotos"><span class="n">2</span><button id="btnFotos">Cargar fotos</button><button id="btnCarpeta" class="chico" title="Elegir una carpeta entera">carpeta</button><small id="lblFotos"></small></div>
+  </div>
+  <div class="esp"></div>
+  <div class="prog" id="prog"><i></i></div>
+  <label class="ayuda" style="display:flex;gap:10px;align-items:center">
+    <span><input type="checkbox" id="chkFeed" checked> Feed</span>
+    <span><input type="checkbox" id="chkStory" checked> Story</span>
+  </label>
+  <button class="prim" id="btnZip" disabled>Descargar placas (.zip)</button>
+  <div class="menu" id="menu"><button id="btnMenu" title="Más opciones">⋯</button>
+    <div class="lista">
+      <button id="mExport">Exportar memoria (títulos y encuadres)</button>
+      <button id="mImport">Importar memoria…</button>
+      <button id="mJsx">Descargar script "convertir a .ai"</button>
+      <button id="mAyuda">Cómo se usa</button>
+    </div>
+  </div>
+</header>
+<main>
+  <aside id="lista"></aside>
+  <section id="editor"></section>
+</main>
+<input type="file" id="inExcel" accept=".xls,.xlsx,.xlsm,.csv" hidden>
+<input type="file" id="inFotos" accept="image/*" multiple hidden>
+<input type="file" id="inCarpeta" webkitdirectory multiple hidden>
+<input type="file" id="inMemoria" accept=".json" hidden>
+<div class="modal" id="modal"><div class="cont">
+  <div class="cab"><h3 id="modalTit">Elegir foto</h3><button id="modalSin" class="chico">Sin foto</button><button id="modalAgregar" class="chico">Agregar fotos…</button><button id="modalCerrar" class="chico">Cerrar</button></div>
+  <div class="grilla" id="grilla"></div>
+</div></div>
+<div class="modal" id="ayuda"><div class="cont" style="width:min(640px,92vw)">
+  <div class="cab"><h3>Cómo se usa</h3><button class="chico" onclick="document.getElementById('ayuda').classList.remove('ver')">Cerrar</button></div>
+  <div style="padding:6px 22px 20px;overflow:auto">
+    <ol>
+      <li><b>Cargar Excel</b>: el del cliente, tal cual viene (.xls o .xlsx).</li>
+      <li><b>Cargar fotos</b>: las fotos de producto (y una para la portada). Si el archivo se llama como el producto o con su número del Excel, se asigna sola. Si no, en cada placa tocá <b>Cambiar foto</b>.</li>
+      <li>Revisá cada placa de la lista. <b>Arrastrá</b> la foto para moverla, usá el control de <b>Zoom</b> (o <b>Ctrl + rueda del mouse</b> sobre la placa) y <b>Espejar</b> si hace falta. Podés corregir títulos, precios y medidas.</li>
+      <li><b>Descargar placas</b>: baja un .zip con un SVG por placa (feed y story).</li>
+      <li>Descomprimí el zip. En Illustrator: <i>Archivo › Secuencias de comandos › Otra secuencia de comandos…</i> (Ctrl+F12) y elegí <b>convertir_a_ai.jsx</b> (viene en el zip). Elegí la carpeta de las placas y se arma un solo .ai con todas las placas (una mesa de trabajo por placa).</li>
+    </ol>
+    <p class="ayuda">El programa recuerda en esta computadora cómo cortaste cada título y cómo encuadraste cada foto, para que si el producto vuelve otro mes salga igual. Con "Exportar memoria" podés pasarle esa memoria a otra persona.</p>
+    <p class="ayuda">La vista previa usa fuentes parecidas: los archivos ya piden Azo Sans y Athelas, que se ven al abrirlos en Illustrator.</p>
+  </div>
+</div></div>
+<div class="drop-hint" id="dropHint">Soltá el Excel y/o las fotos</div>
+<div class="toast" id="toast"></div>
+
+<script>/*XLSX*/</script>
+<script>/*JSZIP*/</script>
+<script>/*ENGINE*/</script>
+<script>
+const DATOS = /*DATOS*/;
+const JSX_AI = /*JSX*/;
+Motor.init(DATOS);
+const M = Motor;
+const $ = s => document.querySelector(s);
+const FORMATOS = ["feed", "story"];
+
+// ------------------------------------------------------------------ estado
+const st = { excelNombre: null, encabezado: "", filas: [], placas: [], imgs: new Map(), sel: null };
+let memoria = { titulos: {}, encuadres: {} };
+try { const m = JSON.parse(localStorage.getItem("placasTM_memoria") || "null"); if (m) memoria = Object.assign(memoria, m); } catch (e) {}
+function guardarMemoria() { try { localStorage.setItem("placasTM_memoria", JSON.stringify(memoria)); } catch (e) {} }
+
+function toast(t, ms = 2600) { const el = $("#toast"); el.textContent = t; el.style.display = "block"; clearTimeout(toast._t); toast._t = setTimeout(() => el.style.display = "none", ms); }
+
+// ------------------------------------------------------------------ carga de archivos
+$("#btnExcel").onclick = () => $("#inExcel").click();
+$("#btnFotos").onclick = () => $("#inFotos").click();
+$("#btnCarpeta").onclick = () => $("#inCarpeta").click();
+$("#inExcel").onchange = e => { if (e.target.files[0]) cargarExcel(e.target.files[0]); e.target.value = ""; };
+$("#inFotos").onchange = e => { cargarFotos([...e.target.files]); e.target.value = ""; };
+$("#inCarpeta").onchange = e => { cargarFotos([...e.target.files].filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp)$/i.test(f.name))); e.target.value = ""; };
+
+async function cargarExcel(file) {
+  try {
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: "array" });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: null, raw: true });
+    const { encabezado, filas } = M.leerFilas(rows);
+    if (!filas.length) throw new Error("El Excel no tiene filas de productos con precio.");
+    st.excelNombre = file.name; st.encabezado = encabezado; st.filas = filas;
+    armarPlacas();
+    $("#lblExcel").textContent = `${file.name} · ${filas.length} filas`;
+    $("#pasoExcel").classList.add("ok");
+  } catch (e) { alert("No pude leer el Excel:\n" + e.message); }
+}
+
+function cargarImagen(file) {
+  return new Promise(res => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => res({ nombre: file.name, file, url, img, w: img.naturalWidth, h: img.naturalHeight });
+    img.onerror = () => res(null);
+    img.src = url;
+  });
+}
+async function cargarFotos(files) {
+  if (!files.length) return;
+  const nuevas = (await Promise.all(files.map(cargarImagen))).filter(Boolean);
+  for (const n of nuevas) st.imgs.set(n.nombre, n);
+  $("#lblFotos").textContent = `${st.imgs.size} fotos`;
+  $("#pasoFotos").classList.add("ok");
+  autoAsignar();
+  render();
+  if ($("#modal").classList.contains("ver")) abrirSelector();
+}
+
+// arrastrar y soltar en toda la ventana
+let dragCnt = 0;
+addEventListener("dragenter", e => { e.preventDefault(); dragCnt++; $("#dropHint").classList.add("ver"); });
+addEventListener("dragleave", e => { dragCnt--; if (dragCnt <= 0) $("#dropHint").classList.remove("ver"); });
+addEventListener("dragover", e => e.preventDefault());
+addEventListener("drop", e => {
+  e.preventDefault(); dragCnt = 0; $("#dropHint").classList.remove("ver");
+  const fs = [...e.dataTransfer.files];
+  const xl = fs.find(f => /\.(xlsx?|xlsm|csv)$/i.test(f.name));
+  const ims = fs.filter(f => /^image\//.test(f.type));
+  (async () => { if (xl) await cargarExcel(xl); if (ims.length) await cargarFotos(ims); })();
+});
+
+// ------------------------------------------------------------------ placas
+function armarPlacas() {
+  const grupos = M.agrupar(st.filas);
+  const [f1, f2] = M.fechaHasta(st.encabezado);
+  const portada = { id: "portada", tipo: "portada", nombre: "portada", nro: 0, pct: M.porcentaje(st.filas),
+    linea1: DATOS.config.portada.linea1, linea2: DATOS.config.portada.linea2, fecha1: f1, fecha2: f2, foto: null, frames: {}, origen: {} };
+  st.placas = [portada].concat(grupos.map((g, i) => {
+    const t = M.partirTitulo(g.base, memoria.titulos);
+    return { id: "p" + i, tipo: "producto", nombre: g.base, nro: g.nros[0], nros: g.nros, l1: t.l1, l2: t.l2, auto: t.auto,
+      variantes: g.variantes.map(v => Object.assign({}, v)), foto: null, frames: {}, origen: {} };
+  }));
+  st.sel = st.placas[1] ? st.placas[1].id : "portada";
+  autoAsignar();
+  render();
+}
+
+function autoAsignar() {
+  if (!st.placas.length || !st.imgs.size) return;
+  const libres = [...st.imgs.keys()].filter(n => !st.placas.some(p => p.foto === n));
+  const prods = st.placas.filter(p => p.tipo === "producto" && !p.foto);
+  const grupos = prods.map(p => ({ base: p.nombre, nros: p.nros }));
+  const { asignadas, portada } = M.emparejar(grupos, libres);
+  const pp = st.placas[0];
+  if (!pp.foto && portada) asignarFoto(pp, portada);
+  for (const gi in asignadas) asignarFoto(prods[gi], asignadas[gi]);
+}
+
+function asignarFoto(p, nombre) {
+  p.foto = nombre; p.frames = {}; p.origen = {};
+  if (!nombre) return;
+  const im = st.imgs.get(nombre);
+  for (const fmt of FORMATOS) {
+    const L = DATOS.config.formatos[fmt];
+    const enc = M.encuadreGuardado(p.nombre, fmt, memoria.encuadres);
+    let encFeed = null;
+    if (!enc && fmt !== "feed") encFeed = M.aGuardar(im.w, im.h, 1080, 1350, p.frames.feed);
+    const tieneFeedGuardado = !!M.encuadreGuardado(p.nombre, "feed", memoria.encuadres);
+    p.frames[fmt] = M.calcularEncuadre(im.w, im.h, L.ancho, L.alto, enc, encFeed);
+    p.origen[fmt] = enc ? "guardado" : (fmt !== "feed" && tieneFeedGuardado ? "derivado" : "auto");
+  }
+}
+
+function avisos(p) {
+  const a = [];
+  if (!p.foto) a.push(["sin foto", "e"]);
+  if (p.tipo === "producto" && p.auto) a.push(["revisar título", "a"]);
+  if (p.tipo === "producto" && p.variantes.length > 3) a.push([p.variantes.length + " precios", "a"]);
+  if (p.tipo === "portada" && String(p.pct).length !== 2) a.push(["% de " + String(p.pct).length + " cifras", "a"]);
+  if (p.foto) {
+    const im = st.imgs.get(p.foto);
+    for (const fmt of FORMATOS) {
+      const fr = p.frames[fmt], L = DATOS.config.formatos[fmt];
+      if (!fr) continue;
+      if (p.origen[fmt] === "auto") a.push([fmt + ": encuadre auto", ""]);
+      if (!M.cubre(im.w, im.h, L.ancho, L.alto, fr)) a.push([fmt + ": fondo extendido", "a"]);
+      if (fr.s > 2.2) a.push([fmt + ": baja resolución", "a"]);
+    }
+  }
+  return a;
+}
+
+// ------------------------------------------------------------------ lista
+function render() { renderLista(); renderEditor(); $("#btnZip").disabled = !st.placas.length; }
+
+function renderLista() {
+  const el = $("#lista");
+  if (!st.placas.length) { el.innerHTML = '<div style="padding:16px" class="ayuda">Cargá el Excel para ver las placas.</div>'; return; }
+  el.innerHTML = "";
+  for (const p of st.placas) {
+    const d = document.createElement("div");
+    d.className = "item" + (p.id === st.sel ? " sel" : "");
+    const im = p.foto && st.imgs.get(p.foto);
+    const t1 = p.tipo === "portada" ? "Portada" : `${String(p.nro).padStart(2, "0")} · ${p.l1 || ""}`;
+    const t2 = p.tipo === "portada" ? `${p.pct}% ${p.linea1} ${p.linea2}` : p.l2;
+    d.innerHTML = `<div class="th ${im ? "" : "vacio"}" style="${im ? `background-image:url('${im.url}')` : ""}"></div>
+      <div class="tx"><div class="t1">${escH(t1)}</div><div class="t2">${escH(t2)}</div>
+      <div class="badges">${avisos(p).map(([t, c]) => `<span class="b ${c}">${escH(t)}</span>`).join("")}</div></div>`;
+    d.onclick = () => { st.sel = p.id; render(); };
+    el.appendChild(d);
+  }
+}
+const escH = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// ------------------------------------------------------------------ editor
+const ESCALA_VISTA = { feed: 360 / 1080, story: 270 / 1080 };
+function placaSel() { return st.placas.find(p => p.id === st.sel); }
+
+function renderEditor() {
+  const ed = $("#editor");
+  const p = placaSel();
+  if (!p) {
+    ed.innerHTML = `<div class="vacio-grande"><div class="caja"><h2>Arrastrá acá el Excel y las fotos</h2>
+      <p>o usá los botones de arriba: <b>1 · Cargar Excel</b> y <b>2 · Cargar fotos</b>.</p>
+      <p class="ayuda">Todo se procesa en esta computadora: nada se sube a internet.</p></div></div>`;
+    return;
+  }
+  const im = p.foto && st.imgs.get(p.foto);
+  let datos = "";
+  if (p.tipo === "portada") {
+    datos = `<div class="tarjeta"><h3>Portada</h3>
+      <label class="c">Porcentaje</label><input type="number" data-k="pct" value="${escH(p.pct)}">
+      <label class="c">Línea 1 (fina)</label><input type="text" data-k="linea1" value="${escH(p.linea1)}">
+      <label class="c">Línea 2 (itálica)</label><input type="text" data-k="linea2" value="${escH(p.linea2)}">
+      <label class="c">Fecha (verde, 1ª línea)</label><input type="text" data-k="fecha1" value="${escH(p.fecha1)}">
+      <label class="c">Fecha (verde, 2ª línea)</label><input type="text" data-k="fecha2" value="${escH(p.fecha2)}"></div>`;
+  } else {
+    datos = `<div class="tarjeta"><h3>Título</h3>
+      <label class="c">Línea fina</label><input type="text" data-k="l1" value="${escH(p.l1)}">
+      <label class="c">Línea itálica</label><input type="text" data-k="l2" value="${escH(p.l2)}">
+      <div class="ayuda" style="margin-top:6px">Excel: ${escH(p.nombre)}</div></div>
+      <div class="tarjeta"><h3>Precios</h3><table class="var"><tr><th>Oferta</th><th>Antes</th><th>Medida</th><th></th></tr>
+      ${p.variantes.map((v, i) => `<tr><td><input type="number" data-v="${i}" data-c="oferta" value="${v.oferta ?? ""}"></td>
+        <td><input type="number" data-v="${i}" data-c="precio" value="${v.precio}"></td>
+        <td><input type="text" data-v="${i}" data-c="variante" value="${escH(v.variante || "")}"></td>
+        <td><button class="chico" data-del="${i}" title="Quitar">✕</button></td></tr>`).join("")}
+      </table><button class="chico" id="addVar" style="margin-top:6px">+ agregar precio</button></div>`;
+  }
+  ed.innerHTML = `<div class="fila"><div class="col-datos">
+      <div class="tarjeta"><h3>Foto</h3><div class="fotoslot">
+        <div class="th" style="${im ? `background-image:url('${im.url}')` : ""}"></div>
+        <div><div class="nom">${im ? escH(im.nombre) + ` <span class="ayuda">(${im.w}×${im.h})</span>` : "Sin foto asignada"}</div>
+        <button id="btnCambiar">${im ? "Cambiar foto" : "Elegir foto"}</button></div></div></div>
+      ${datos}</div>
+    <div class="escenarios">${FORMATOS.map(fmt => escenaHTML(fmt, p)).join("")}</div></div>`;
+
+  $("#btnCambiar").onclick = abrirSelector;
+  ed.querySelectorAll("input[data-k]").forEach(inp => inp.oninput = () => {
+    p[inp.dataset.k] = inp.type === "number" ? (inp.value === "" ? "" : Number(inp.value)) : inp.value;
+    if (inp.dataset.k === "l1" || inp.dataset.k === "l2") p.auto = false;
+    refrescarSobre(p); renderLista();
+  });
+  ed.querySelectorAll("input[data-v]").forEach(inp => inp.oninput = () => {
+    const v = p.variantes[+inp.dataset.v], c = inp.dataset.c;
+    v[c] = c === "variante" ? (inp.value.trim() || null) : (inp.value === "" ? null : Number(inp.value));
+    refrescarSobre(p);
+  });
+  ed.querySelectorAll("button[data-del]").forEach(b => b.onclick = () => { if (p.variantes.length > 1) { p.variantes.splice(+b.dataset.del, 1); render(); } });
+  const add = $("#addVar"); if (add) add.onclick = () => { p.variantes.push({ precio: 0, oferta: null, variante: null }); render(); };
+  for (const fmt of FORMATOS) montarEscena(fmt, p);
+}
+
+function escenaHTML(fmt, p) {
+  const L = DATOS.config.formatos[fmt], k = ESCALA_VISTA[fmt];
+  const fr = p.frames[fmt], im = p.foto && st.imgs.get(p.foto);
+  const cover = im ? Math.max(L.ancho / im.w, L.alto / im.h) : 1;
+  const zoom = fr ? fr.s / cover : 1;
+  const org = { guardado: "encuadre guardado", derivado: "derivado del feed", auto: "encuadre automático", manual: "ajustado a mano" }[p.origen[fmt]] || "";
+  return `<div class="escena" data-fmt="${fmt}">
+    <div class="tit">${fmt === "feed" ? "Feed 1080×1350" : "Story 1080×1920"} <small>${org}</small></div>
+    <div class="lienzo" id="lz_${fmt}" style="width:${L.ancho * k}px;height:${L.alto * k}px"><canvas></canvas><div class="sobre"></div></div>
+    <div class="ctrl"><span class="ayuda" title="También: Ctrl + rueda del mouse sobre la placa">Zoom</span><input type="range" min="0.4" max="3" step="0.005" value="${zoom}" ${im ? "" : "disabled"} data-zoom="${fmt}">
+      <button class="chico ${fr && fr.espejo ? "on" : ""}" data-esp="${fmt}" ${im ? "" : "disabled"}>Espejar</button></div>
+    <div class="ctrl"><button class="chico" data-cub="${fmt}" ${im ? "" : "disabled"}>Cubrir y centrar</button>
+      ${fmt !== "feed" ? `<button class="chico" data-der="${fmt}" ${im ? "" : "disabled"}>Copiar del feed</button>` : ""}</div>
+  </div>`;
+}
+
+function montarEscena(fmt, p) {
+  const lz = $("#lz_" + fmt), cv = lz.querySelector("canvas"), L = DATOS.config.formatos[fmt], k = ESCALA_VISTA[fmt];
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(L.ancho * k * dpr); cv.height = Math.round(L.alto * k * dpr);
+  dibujarEscena(fmt, p);
+  refrescarSobre(p, fmt);
+  const im = p.foto && st.imgs.get(p.foto);
+  if (!im) return;
+  let drag = null;
+  lz.onpointerdown = e => { lz.setPointerCapture(e.pointerId); lz.classList.add("arr"); drag = { x: e.clientX, y: e.clientY, fx: p.frames[fmt].x, fy: p.frames[fmt].y }; };
+  lz.onpointermove = e => {
+    if (!drag) return;
+    const fr = p.frames[fmt];
+    fr.x = drag.fx + (e.clientX - drag.x) / k; fr.y = drag.fy + (e.clientY - drag.y) / k;
+    imantar(fr, im, L);
+    marcarManual(p, fmt); dibujarEscena(fmt, p);
+  };
+  lz.onpointerup = lz.onpointercancel = () => { if (drag) { drag = null; lz.classList.remove("arr"); renderLista(); } };
+  lz.onwheel = e => {
+    // la rueda sola desplaza la página; con Ctrl (o pellizco en el trackpad) hace zoom
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    const r = lz.getBoundingClientRect();
+    const cx = (e.clientX - r.left) / k, cy = (e.clientY - r.top) / k;
+    zoomEn(p, fmt, p.frames[fmt].s * Math.exp(-e.deltaY * 0.0015), cx, cy);
+  };
+  const rg = document.querySelector(`[data-zoom="${fmt}"]`);
+  rg.oninput = () => { const cover = Math.max(L.ancho / im.w, L.alto / im.h); zoomEn(p, fmt, cover * Number(rg.value), L.ancho / 2, L.alto / 2, true); };
+  document.querySelector(`[data-esp="${fmt}"]`).onclick = e => {
+    const fr = p.frames[fmt]; fr.espejo = !fr.espejo;
+    // espejar alrededor del centro del lienzo
+    fr.x = L.ancho - (fr.x + im.w * fr.s);
+    e.target.classList.toggle("on", fr.espejo); marcarManual(p, fmt); dibujarEscena(fmt, p); renderLista();
+  };
+  document.querySelector(`[data-cub="${fmt}"]`).onclick = () => {
+    const esp = p.frames[fmt].espejo;
+    p.frames[fmt] = Object.assign(M.calcularEncuadre(im.w, im.h, L.ancho, L.alto, null, null), { espejo: esp });
+    marcarManual(p, fmt); renderEditor(); renderLista();
+  };
+  const der = document.querySelector(`[data-der="${fmt}"]`);
+  if (der) der.onclick = () => {
+    p.frames[fmt] = M.calcularEncuadre(im.w, im.h, L.ancho, L.alto, null, M.aGuardar(im.w, im.h, 1080, 1350, p.frames.feed));
+    marcarManual(p, fmt); renderEditor(); renderLista();
+  };
+}
+
+function zoomEn(p, fmt, s, cx, cy, desdeSlider) {
+  const fr = p.frames[fmt], L = DATOS.config.formatos[fmt], im = st.imgs.get(p.foto);
+  const cover = Math.max(L.ancho / im.w, L.alto / im.h);
+  s = Math.min(cover * 3, Math.max(cover * 0.4, s));
+  fr.x = cx - (cx - fr.x) * s / fr.s; fr.y = cy - (cy - fr.y) * s / fr.s; fr.s = s;
+  imantar(fr, im, L);
+  if (!desdeSlider) { const rg = document.querySelector(`[data-zoom="${fmt}"]`); if (rg) rg.value = s / cover; }
+  marcarManual(p, fmt); dibujarEscena(fmt, p);
+  clearTimeout(zoomEn._t); zoomEn._t = setTimeout(renderLista, 300);
+}
+
+/** si un borde de la foto queda a menos de 20 px del borde de la placa, se pega (evita franjas sin cubrir) */
+function imantar(fr, im, L) {
+  const w = im.w * fr.s, h = im.h * fr.s, T = 20;
+  if (Math.abs(fr.x) < T) fr.x = 0;
+  if (Math.abs(fr.x + w - L.ancho) < T) fr.x = L.ancho - w;
+  if (Math.abs(fr.y) < T) fr.y = 0;
+  if (Math.abs(fr.y + h - L.alto) < T) fr.y = L.alto - h;
+}
+
+function marcarManual(p, fmt) {
+  if (p.origen[fmt] !== "manual") {
+    p.origen[fmt] = "manual";
+    const t = document.querySelector(`.escena[data-fmt="${fmt}"] .tit small`); if (t) t.textContent = "ajustado a mano";
+  }
+}
+
+// ------------------------------------------------------------------ dibujo de foto + fondo extendido
+const cacheEspejo = new WeakMap();
+function fuente(im, espejo) {
+  if (!espejo) return im.img;
+  let c = cacheEspejo.get(im.img);
+  if (!c) {
+    c = document.createElement("canvas"); c.width = im.w; c.height = im.h;
+    const x = c.getContext("2d"); x.translate(im.w, 0); x.scale(-1, 1); x.drawImage(im.img, 0, 0);
+    cacheEspejo.set(im.img, c);
+  }
+  return c;
+}
+
+/** canvas W×H (a escala k) con el fondo extendido: continúa los bordes de la foto y los difumina */
+function fondoExtendido(im, fr, W, H, k) {
+  const src = fuente(im, fr.espejo), iw = im.w, ih = im.h;
+  const cw = Math.max(2, Math.round(W * k)), ch = Math.max(2, Math.round(H * k));
+  const c = document.createElement("canvas"); c.width = cw; c.height = ch;
+  const g = c.getContext("2d");
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high";
+  g.scale(k, k);
+  const x = fr.x, y = fr.y, w = iw * fr.s, h = ih * fr.s, R = x + w, B = y + h;
+  const strip = (sx, sy, sw, sh, dx, dy, dw, dh) => { if (dw > 0 && dh > 0) g.drawImage(src, sx, sy, sw, sh, dx, dy, dw, dh); };
+  strip(0, 0, iw, 2, x, Math.min(0, y), w, Math.max(0, y) - Math.min(0, y) + 1);            // arriba
+  strip(0, ih - 2, iw, 2, x, B - 1, w, H - B + 1);                                          // abajo
+  strip(0, 0, 2, ih, Math.min(0, x), y, Math.max(0, x) - Math.min(0, x) + 1, h);            // izquierda
+  strip(iw - 2, 0, 2, ih, R - 1, y, W - R + 1, h);                                          // derecha
+  strip(0, 0, 2, 2, 0, 0, x + 1, y + 1);                                                    // esquinas
+  strip(iw - 2, 0, 2, 2, R - 1, 0, W - R + 1, y + 1);
+  strip(0, ih - 2, 2, 2, 0, B - 1, x + 1, H - B + 1);
+  strip(iw - 2, ih - 2, 2, 2, R - 1, B - 1, W - R + 1, H - B + 1);
+  g.drawImage(src, x, y, w, h);
+  // difuminar: achicar mucho y volver a agrandar
+  const t = document.createElement("canvas"); t.width = Math.max(2, Math.round(cw / 12)); t.height = Math.max(2, Math.round(ch / 12));
+  const tg = t.getContext("2d"); tg.imageSmoothingQuality = "high"; tg.drawImage(c, 0, 0, t.width, t.height);
+  const out = document.createElement("canvas"); out.width = cw; out.height = ch;
+  const og = out.getContext("2d"); og.imageSmoothingQuality = "high"; og.drawImage(t, 0, 0, cw, ch);
+  return out;
+}
+
+function dibujarEscena(fmt, p) {
+  const lz = $("#lz_" + fmt); if (!lz) return;
+  const cv = lz.querySelector("canvas"), g = cv.getContext("2d"), L = DATOS.config.formatos[fmt];
+  const k = cv.width / L.ancho;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = "#cfcfca"; g.fillRect(0, 0, cv.width, cv.height);
+  const im = p.foto && st.imgs.get(p.foto);
+  if (!im) return;
+  const fr = p.frames[fmt];
+  g.imageSmoothingQuality = "high";
+  if (!M.cubre(im.w, im.h, L.ancho, L.alto, fr)) g.drawImage(fondoExtendido(im, fr, L.ancho, L.alto, k), 0, 0, cv.width, cv.height);
+  g.setTransform(k, 0, 0, k, 0, 0);
+  g.drawImage(fuente(im, fr.espejo), fr.x, fr.y, im.w * fr.s, im.h * fr.s);
+}
+
+function datosPlaca(p) {
+  if (p.tipo === "portada") return { tipo: "portada", pct: p.pct, linea1: p.linea1, linea2: p.linea2, fecha1: p.fecha1, fecha2: p.fecha2 };
+  return { tipo: "producto", l1: p.l1, l2: p.l2, variantes: p.variantes.filter(v => v.precio != null && v.precio !== "") };
+}
+function refrescarSobre(p, soloFmt) {
+  for (const fmt of soloFmt ? [soloFmt] : FORMATOS) {
+    const lz = $("#lz_" + fmt); if (!lz) continue;
+    lz.querySelector(".sobre").innerHTML = M.svg(fmt, datosPlaca(p), null, true).replace(/^<\?xml[^>]*>\s*/, "");
+  }
+}
+
+// ------------------------------------------------------------------ selector de fotos
+function abrirSelector() {
+  const p = placaSel(); if (!p) return;
+  $("#modalTit").textContent = "Foto para: " + (p.tipo === "portada" ? "Portada" : `${p.l1} ${p.l2}`);
+  const gr = $("#grilla"); gr.innerHTML = "";
+  if (!st.imgs.size) gr.innerHTML = '<div class="ayuda" style="padding:20px">Todavía no cargaste fotos. Tocá "Agregar fotos…".</div>';
+  for (const [n, im] of st.imgs) {
+    const usadaPor = st.placas.find(q => q.foto === n && q !== p);
+    const d = document.createElement("div");
+    d.className = "op" + (p.foto === n ? " sel" : "");
+    d.innerHTML = `<div class="im" style="background-image:url('${im.url}')"></div><div class="nm">${escH(n)}</div>
+      ${usadaPor ? `<div class="usada">usada en: ${escH(usadaPor.tipo === "portada" ? "Portada" : usadaPor.l2)}</div>` : ""}`;
+    d.onclick = () => { asignarFoto(p, n); cerrarSelector(); render(); };
+    gr.appendChild(d);
+  }
+  $("#modal").classList.add("ver");
+}
+function cerrarSelector() { $("#modal").classList.remove("ver"); }
+$("#modalCerrar").onclick = cerrarSelector;
+$("#modalSin").onclick = () => { const p = placaSel(); if (p) asignarFoto(p, null); cerrarSelector(); render(); };
+$("#modalAgregar").onclick = () => $("#inFotos").click();
+$("#modal").onclick = e => { if (e.target.id === "modal") cerrarSelector(); };
+addEventListener("keydown", e => { if (e.key === "Escape") { cerrarSelector(); $("#ayuda").classList.remove("ver"); } });
+
+// ------------------------------------------------------------------ exportar
+function canvasA(c, tipo = "image/jpeg", q = 0.9) { return c.toDataURL(tipo, q); }
+
+function exportarFoto(im, fr) {
+  // se embebe la foto con su resolución original (o reducida si sobra), ya espejada si corresponde
+  const src = fuente(im, fr.espejo);
+  const nw = im.w * fr.s, nh = im.h * fr.s;
+  const f = Math.min(1, Math.max(nw / im.w, 0.01) * 1.0);
+  const c = document.createElement("canvas"); c.width = Math.max(1, Math.round(im.w * f)); c.height = Math.max(1, Math.round(im.h * f));
+  const g = c.getContext("2d"); g.imageSmoothingQuality = "high"; g.drawImage(src, 0, 0, c.width, c.height);
+  return { href: canvasA(c), w: nw, h: nh };
+}
+
+function nombreArchivo(p) {
+  if (p.tipo === "portada") return "00_Portada";
+  return `${String(p.nro).padStart(2, "0")}_${M.slug(`${p.l1} ${p.l2}`)}`;
+}
+
+function reporte() {
+  const out = [`Placas generadas desde: ${st.excelNombre || "-"}`, `${st.encabezado}`, ""];
+  for (const p of st.placas) {
+    let l = p.tipo === "portada" ? `00 Portada: ${p.pct}% · ${p.fecha1} ${p.fecha2}` :
+      `${nombreArchivo(p)}: ${p.l1} / ${p.l2} · ` + p.variantes.map(v => `${v.oferta != null ? M.fmtPrecio(v.oferta) + " " : ""}${M.fmtPrecio(v.precio)}${v.variante ? " (" + v.variante + ")" : ""}`).join(" | ");
+    l += ` · foto: ${p.foto || "-"}`;
+    const a = avisos(p).map(x => x[0]);
+    if (a.length) l += "  ⚠ " + a.join(", ");
+    out.push(l);
+  }
+  const usadas = new Set(st.placas.map(p => p.foto));
+  const sobr = [...st.imgs.keys()].filter(n => !usadas.has(n));
+  if (sobr.length) out.push("", "Fotos sin usar: " + sobr.join(", "));
+  return out.join("\r\n");
+}
+
+function recordar() {
+  for (const p of st.placas) {
+    if (p.tipo === "producto" && p.l2) memoria.titulos[p.nombre] = [p.l1, p.l2];
+    if (!p.foto) continue;
+    const im = st.imgs.get(p.foto);
+    for (const fmt of FORMATOS) {
+      if (!p.frames[fmt]) continue;
+      if (p.origen[fmt] === "manual" || p.origen[fmt] === "guardado" || fmt === "feed") {
+        const L = DATOS.config.formatos[fmt];
+        memoria.encuadres[M.norm(p.nombre) + "|" + fmt] = M.aGuardar(im.w, im.h, L.ancho, L.alto, p.frames[fmt]);
+      }
+    }
+  }
+  guardarMemoria();
+}
+
+$("#btnZip").onclick = async () => {
+  const fmts = FORMATOS.filter(f => $(f === "feed" ? "#chkFeed" : "#chkStory").checked);
+  if (!fmts.length) return toast("Elegí al menos feed o story.");
+  const sinFoto = st.placas.filter(p => !p.foto);
+  if (sinFoto.length && !confirm(`${sinFoto.length} placa(s) no tienen foto (${sinFoto.map(p => p.tipo === "portada" ? "Portada" : p.l2).join(", ")}).\n¿Generar igual?`)) return;
+  const btn = $("#btnZip"); btn.disabled = true; const pr = $("#prog"); pr.style.display = "block";
+  try {
+    const zip = new JSZip();
+    const carpeta = "Placas_" + (st.excelNombre ? st.excelNombre.replace(/\.[^.]+$/, "").replace(/[^\w\-]+/g, "_") : "TM");
+    const dir = zip.folder(carpeta);
+    const total = st.placas.length * fmts.length; let n = 0;
+    for (const p of st.placas) {
+      const im = p.foto && st.imgs.get(p.foto);
+      for (const fmt of fmts) {
+        const L = DATOS.config.formatos[fmt];
+        let foto = null;
+        if (im) {
+          const fr = p.frames[fmt];
+          foto = Object.assign({ x: fr.x, y: fr.y }, exportarFoto(im, fr));
+          if (!M.cubre(im.w, im.h, L.ancho, L.alto, fr)) foto.extHref = canvasA(fondoExtendido(im, fr, L.ancho, L.alto, 1), "image/jpeg", 0.85);
+        }
+        dir.file(`${nombreArchivo(p)}_${fmt}.svg`, M.svg(fmt, datosPlaca(p), foto, false));
+        n++; pr.firstElementChild.style.width = (n / total * 100) + "%";
+        await new Promise(r => setTimeout(r, 0));
+      }
+    }
+    dir.file("reporte.txt", reporte());
+    dir.file("convertir_a_ai.jsx", JSX_AI);
+    dir.file("LEEME.txt", "Para armar el .ai: descomprimí el zip. En Illustrator, Archivo > Secuencias de comandos > Otra secuencia de comandos... (Ctrl+F12) y elegí convertir_a_ai.jsx.\r\nElegí esta carpeta: se crea un solo .ai con todas las placas, una mesa de trabajo por placa y una capa por producto.\r\n");
+    const blob = await zip.generateAsync({ type: "blob" });
+    descargar(blob, carpeta + ".zip");
+    recordar();
+    toast("Listo: " + total + " placas descargadas.");
+  } catch (e) { console.error(e); alert("Hubo un error al generar: " + e.message); }
+  finally { btn.disabled = false; pr.style.display = "none"; pr.firstElementChild.style.width = "0"; }
+};
+
+function descargar(blob, nombre) {
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nombre;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+}
+
+// ------------------------------------------------------------------ menú
+$("#btnMenu").onclick = e => { e.stopPropagation(); $("#menu").classList.toggle("abierto"); };
+addEventListener("click", () => $("#menu").classList.remove("abierto"));
+$("#mExport").onclick = () => { recordar(); descargar(new Blob([JSON.stringify(memoria, null, 1)], { type: "application/json" }), "memoria_placas_TM.json"); };
+$("#mImport").onclick = () => $("#inMemoria").click();
+$("#inMemoria").onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  try {
+    const m = JSON.parse(await f.text());
+    Object.assign(memoria.titulos, m.titulos || {}); Object.assign(memoria.encuadres, m.encuadres || {});
+    guardarMemoria(); toast("Memoria importada. Se aplica al volver a cargar el Excel o asignar fotos.");
+  } catch (er) { alert("Ese archivo no es una memoria válida."); }
+};
+$("#mJsx").onclick = () => descargar(new Blob([JSX_AI], { type: "text/plain" }), "convertir_a_ai.jsx");
+$("#mAyuda").onclick = () => $("#ayuda").classList.add("ver");
+
+render();
+</script>
+</body>
+</html>
